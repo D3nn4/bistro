@@ -1,10 +1,8 @@
 NAME = bistro.exec
 
 SRC = 	bistro.cpp \
-		arguments.cpp \
-		number.cpp \
-		add.cpp \
-		sub.cpp 
+		lexer.cpp \
+		token.cpp 
 		
 HEADER = -I.
 
