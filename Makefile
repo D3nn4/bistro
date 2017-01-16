@@ -2,7 +2,11 @@ NAME = bistro.exec
 
 SRC = 	bistro.cpp \
 		lexer.cpp \
-		token.cpp 
+		token.cpp \
+		main.cpp \
+		number.cpp \
+		utility.cpp \
+		
 		
 HEADER = -I.
 

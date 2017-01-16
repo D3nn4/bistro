@@ -3,8 +3,9 @@
 #include <iostream>
 
 #include "token.hpp"
+#include "bistro.hpp"
 
-std::vector<Token> lexer(std::string av)
+std::vector<Token> Bistro::lexer(std::string av)
 {
 	std::vector<Token> tokens;
 	std::string current_value;
@@ -15,7 +16,7 @@ std::vector<Token> lexer(std::string av)
 		}
 		else {
 			if (!current_value.empty()) {
-				Token temp(current_value, "num");
+				Token temp(current_value, Token::Type::NUM);
 				tokens.push_back(temp);
 				current_value.erase(current_value.begin(), current_value.end());
 			}
@@ -23,13 +24,13 @@ std::vector<Token> lexer(std::string av)
 				|| *it == '*' || *it == '/') {
 			std::string value_op;
 			value_op += *it;
-			Token temp(value_op, "op");
+			Token temp(value_op, Token::Type::OP);
 			tokens.push_back(temp);
 			}
 			else if (*it == '(' || *it == ')') {
 				std::string value_par;
 				value_par += *it;
-				Token temp(value_par, "par");
+				Token temp(value_par, Token::Type::PARENTHESE);
 				tokens.push_back(temp);
 			}
 			else if (*it != ' ' && *it != '\0' && *it != '\n') {
@@ -39,7 +40,7 @@ std::vector<Token> lexer(std::string av)
 		}
 	}
 	if (!current_value.empty()) {
-		Token temp(current_value, "num");
+		Token temp(current_value, Token::Type::NUM);
 		tokens.push_back(temp);
 		current_value.erase(current_value.begin(), current_value.end());
 	}

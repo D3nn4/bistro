@@ -4,24 +4,18 @@
 #include <iostream>
 #include <string>
 
-class Token
-{
-	private:
+struct Token
+{	
 
-	protected:
+	enum Type {
+		NUM, 
+		OP,
+		PARENTHESE
+	};
 
-		std::string  _value;
-		std::string _type;
-		Token();
-		//Token(Token const &src); 
-		//Token &operator=(Token const &src);
-
-	public:
-		Token(std::string value, std::string type);
-		~Token();
-		std::string getValue() const;
-		std::string getType() const;
-		
+	Token(std::string value, Type type);
+	std::string  value;
+	Type type;
 };
 
 std::ostream &operator<<(std::ostream &o, Token const &Token);

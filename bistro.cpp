@@ -1,36 +1,46 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <stdbool.h>
 
-#include "lexer.hpp"
+#include "bistro.hpp"
 #include "token.hpp"
+#include "number.hpp"
+#include "utility.hpp"
 
-
-void bistro(char **argv)
+Bistro::Bistro(char *argv)
 {
-	std::string arg(argv[1]);
-	std::vector<Token> tokens = lexer(arg);
-
-	//std::stack<std::string> actions;
-	//std::stack<std::string> numbers;
-
-
-
-
-
-	std::vector<Token>::iterator it = tokens.begin();
-	while (it != tokens.end()) {
-		std::cout << *it;
-		++it;
-	}
-	
+	std::string arg(argv);
+	_tokens = lexer(arg);
 }
 
-
-int main(int argc, char **argv)
+bool Bistro::isVIP(Token token)
 {
-	if (argc > 1){
-		bistro(argv);
+	if (token.value.compare("*") || token.value.compare("/"))
+		return true;
+	return false;
+}
+
+void Bistro::stacking()
+{
+	std::vector<Token>::iterator it = _tokens.begin();
+	for (; it < _tokens.end(); ++it) {
+		if ((*it).type == Token::Type::NUM) {
+			Number temp = Utility::stringToNumber((*it).value);
+			_numbers.push(temp);
+		}
+		else {
+			_actions.push((*it).value);
+		}
 	}
-	return 0;
+	
+	while (!_numbers.empty()) {
+		std::cout << _numbers.top();
+		_numbers.pop(); 
+	}
+	
+	while (!_actions.empty()) {
+		std::cout << _actions.top() << "\n";
+		_actions.pop();
+	}
 }
