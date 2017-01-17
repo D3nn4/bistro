@@ -20,6 +20,8 @@ class Bistro
 		std::vector<Token> lexer(std::string av);
 		bool isVIP(Token token);
 		void stacking();
+		void printStacks();
+		void calcul();
 };
 
 std::ostream &operator<<(std::ostream &o, Bistro const &bistro);

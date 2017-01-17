@@ -13,3 +13,13 @@ Number Utility::stringToNumber(std::string str)
 	Number number(num, '+');
 	return number;
 }
+
+std::vector<int> Utility::reverseVector(std::vector<int> number)
+{
+	std::vector<int> toReturn;
+	std::vector<int>::reverse_iterator it = number.rbegin();
+	for (; it != number.rend(); ++it) {
+		toReturn.push_back(*it);
+	}
+	return toReturn;
+}
