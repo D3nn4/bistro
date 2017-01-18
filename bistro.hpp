@@ -18,9 +18,9 @@ class Bistro
 	public:
 		Bistro(char *argv);
 		std::vector<Token> lexer(std::string av);
-		bool isVIP(Token token);
 		void stacking();
 		void printStacks();
+		std::vector<Token>::iterator parenthesePriority(std::vector<Token>::iterator it);
 		void calcul();
 };
 

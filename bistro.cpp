@@ -15,13 +15,6 @@ Bistro::Bistro(char *argv)
 	_tokens = lexer(arg);
 }
 
-bool Bistro::isVIP(Token token)
-{
-	if (token.value.compare("*") || token.value.compare("/"))
-		return true;
-	return false;
-}
-
 void Bistro::printStacks()
 {
 	while (!_numbers.empty()) {
@@ -42,7 +35,25 @@ void Bistro::stacking()
 			_numbers.push(temp);
 		}
 		else {
-			_actions.push((*it).value);
+			if ((*it).value.compare("*") == 0) {
+				++it;
+				Number num2 = Utility::stringToNumber((*it).value);
+				Number num1 = _numbers.top();
+				Number result = Operation::mult(num1.getNumber(), num2.getNumber());
+				std::cout << num1 << " * " << num2 << " = " << result;
+				_numbers.pop();
+				_numbers.push(result);
+
+			}
+			/*else if ((*it).value.compare("(") == 0) {
+				it = parenthesePriority(it);
+			}
+			else if ((*it).value.compare(")") == 0) {
+				break;
+			}*/
+			else {
+				_actions.push((*it).value);
+			}
 		}
 	}
 		//printStacks();

@@ -125,7 +125,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 			leftToAdd = toAdd.getNumber();
 	}
 
-	Number result(Utility::reverseVector(leftToAdd), sign);
+	Number result(leftToAdd, sign);
 	return result;
 }
 /*
