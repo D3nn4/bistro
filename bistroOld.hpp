@@ -12,17 +12,16 @@ class Bistro
 
 	protected:
 		std::vector<Token> _tokens;
-		std::stack<Token> _actions;
+		std::stack<std::string> _actions;
+		std::vector<Token> _output;
 		std::stack<Number> _numbers;
-		
 
 	public:
 		Bistro(char *argv);
 		std::vector<Token> lexer(std::string av);
 		void stacking();
 		void printStacks();
-		void unstacking();
-		Number calcul();
+		void calcul();
 };
 
 std::ostream &operator<<(std::ostream &o, Bistro const &bistro);

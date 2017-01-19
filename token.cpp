@@ -10,6 +10,6 @@ Token::Token(std::string value, Type type)
 
 std::ostream &operator<<(std::ostream &o, Token const &token)
 {
-	o << token.value << "\n";
+	o << token.value;
 	return o;
 }

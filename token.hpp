@@ -7,10 +7,14 @@
 struct Token
 {	
 
-	enum Type {
+	enum class Type {
 		NUM, 
-		OP,
-		PARENTHESE
+		ADD,
+		SUB,
+		MULT,
+		DIV,
+		OPENPAR,
+		CLOSEPAR
 	};
 
 	Token(std::string value, Type type);

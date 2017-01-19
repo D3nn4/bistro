@@ -32,13 +32,13 @@ Number Operation::add(std::vector<int> num1, std::vector<int> num2)
 	}
 	if (rest > 0) 
 		final_result.push_back(rest);
-	Number result(Utility::reverseVector(final_result), '+');
+	Number result(Utility::reverseVector(final_result), Number::Sign::POSITIF);
 	return result;
 }
 
 Number Operation::sub(std::vector<int> num1, std::vector<int> num2)
 {
-	char sign = '+';
+	Number::Sign sign = Number::Sign::POSITIF;
 	std::vector<int> final_result;
 	int rest = 0;
 	int total = 0;
@@ -48,7 +48,7 @@ Number Operation::sub(std::vector<int> num1, std::vector<int> num2)
 		temp = num2;
 		num2 = num1;
 		num1 = temp;
-		sign = '-';
+		sign = Number::Sign::NEGATIF;
 	}
 	std::vector<int>::reverse_iterator curr_num1 = num1.rbegin();
 	std::vector<int>::reverse_iterator curr_num2 = num2.rbegin();
@@ -83,7 +83,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 {
 	int shift = 0;
 	int rest = 0;
-	char sign = '+';
+	Number::Sign sign = Number::Sign::POSITIF;
 	std::vector<int> leftToAdd;
 	std::vector<int> rightToAdd;
 	std::vector<int>::reverse_iterator curr_num2 = num2.rbegin();
@@ -108,7 +108,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 			Number toAdd = add(leftToAdd, rightToAdd);
 			leftToAdd.clear();
 			rightToAdd.clear();
-			leftToAdd = toAdd.getNumber();
+			leftToAdd = toAdd.number;
 		}
 		else if (leftToAdd.empty()) {
 			leftToAdd = Utility::reverseVector(temp);
@@ -122,7 +122,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 			Number toAdd = add(leftToAdd, rightToAdd);
 			leftToAdd.clear();
 			rightToAdd.clear();
-			leftToAdd = toAdd.getNumber();
+			leftToAdd = toAdd.number;
 	}
 
 	Number result(leftToAdd, sign);
@@ -131,5 +131,5 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 /*
 void Operation::div(std::vector<int> num1, std::vector<int> num2)
 {
-	std::cout << "div\n";
+	
 }*/

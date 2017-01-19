@@ -20,17 +20,40 @@ std::vector<Token> Bistro::lexer(std::string av)
 				tokens.push_back(temp);
 				current_value.erase(current_value.begin(), current_value.end());
 			}
-			if (*it == '+' || *it == '-' 
-				|| *it == '*' || *it == '/') {
-			std::string value_op;
-			value_op += *it;
-			Token temp(value_op, Token::Type::OP);
-			tokens.push_back(temp);
+			if (*it == '+') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::ADD);
+				tokens.push_back(temp);
 			}
-			else if (*it == '(' || *it == ')') {
+			else if (*it == '-') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::SUB);
+				tokens.push_back(temp);
+			}
+			else if (*it == '*') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::MULT);
+				tokens.push_back(temp);
+			}
+			else if (*it == '/') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::DIV);
+				tokens.push_back(temp);
+			}
+			else if (*it == '(') {
 				std::string value_par;
 				value_par += *it;
-				Token temp(value_par, Token::Type::PARENTHESE);
+				Token temp(value_par, Token::Type::OPENPAR);
+				tokens.push_back(temp);
+			}
+			else if (*it == ')') {
+				std::string value_par;
+				value_par += *it;
+				Token temp(value_par, Token::Type::CLOSEPAR);
 				tokens.push_back(temp);
 			}
 			else if (*it != ' ' && *it != '\0' && *it != '\n') {

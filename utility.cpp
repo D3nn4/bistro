@@ -10,7 +10,7 @@ Number Utility::stringToNumber(std::string str)
 	{
 		num.push_back(str[i] - '0');
 	}
-	Number number(num, '+');
+	Number number(num, Number::Sign::POSITIF);
 	return number;
 }
 

@@ -4,24 +4,19 @@
 #include <iostream>
 
 
-class Number
+struct Number
 {
-	protected:
+	
+		enum class Sign {
+			POSITIF,
+			NEGATIF
+		};
 
-		std::vector<int>  _number;
-		char _sign;
-		Number();
+		Number(std::vector<int> number, Number::Sign sign);
+		Number(){};
+		std::vector<int>  number;
+		Sign sign;
 		
-
-	public:
-		Number(std::vector<int> number, char sign);
-		~Number();
-		void setNumber(std::vector<int> number);
-		void setSign(char sign);
-		std::vector<int> getNumber() const;
-		char getSign() const;
-		Number(Number const &src); 
-		Number &operator=(Number const &src);
 };
 
 std::ostream &operator<<(std::ostream &o, Number const &number);

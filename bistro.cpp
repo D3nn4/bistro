@@ -2,6 +2,7 @@
 #include <string>
 #include <stack>
 #include <stdbool.h>
+#include <cstdlib>
 
 #include "bistro.hpp"
 #include "token.hpp"
@@ -13,12 +14,13 @@ Bistro::Bistro(char *argv)
 {
 	std::string arg(argv);
 	_tokens = lexer(arg);
+	stacking();
 }
 
 void Bistro::printStacks()
 {
 	while (!_numbers.empty()) {
-		std::cout << _numbers.top();
+		std::cout << _numbers.top() << "\n";
 		_numbers.pop(); 
 	}
 	while (!_actions.empty()) {
@@ -26,99 +28,83 @@ void Bistro::printStacks()
 		_actions.pop();
 	}
 }
+
 void Bistro::stacking()
 {
 	std::vector<Token>::iterator it = _tokens.begin();
 	for (; it < _tokens.end(); ++it) {
 		if ((*it).type == Token::Type::NUM) {
-			Number temp = Utility::stringToNumber((*it).value);
-			_numbers.push(temp);
+			_numbers.push(Utility::stringToNumber((*it).value));
 		}
-		else {
-			if ((*it).value.compare("*") == 0) {
-				++it;
-				Number num2 = Utility::stringToNumber((*it).value);
-				Number num1 = _numbers.top();
-				Number result = Operation::mult(num1.getNumber(), num2.getNumber());
-				std::cout << num1 << " * " << num2 << " = " << result;
-				_numbers.pop();
-				_numbers.push(result);
-
+		else if ((*it).type == Token::Type::OPENPAR) {
+			_actions.push(*it);
+		}
+		else if ((*it).type == Token::Type::CLOSEPAR) {
+			while (_actions.top().type != Token::Type::OPENPAR) {
+				_numbers.push(calcul());
 			}
-			/*else if ((*it).value.compare("(") == 0) {
-				it = parenthesePriority(it);
+			_actions.pop();
+		}
+		else if ((*it).type == Token::Type::ADD || (*it).type == Token::Type::SUB) {
+			if((!_actions.empty()) && ((_actions.top().type == Token::Type::MULT) 
+				|| (_actions.top().type == Token::Type::DIV))) {
+				_numbers.push(calcul());
 			}
-			else if ((*it).value.compare(")") == 0) {
-				break;
-			}*/
-			else {
-				_actions.push((*it).value);
+			_actions.push(*it);
+		}
+		else if ((*it).type == Token::Type::MULT || (*it).type == Token::Type::DIV) {
+			if((!_actions.empty()) && ((_actions.top().type == Token::Type::MULT) 
+				|| (_actions.top().type == Token::Type::DIV))) {
+				_numbers.push(calcul());
 			}
+			_actions.push(*it);
 		}
 	}
-		//printStacks();
-
+	unstacking();
 }
 
-void Bistro::calcul()
+void Bistro::unstacking()
 {
-	if (_actions.empty() || _numbers.empty()) {
-		std::cout << "error calcul \n";
-		exit(0);
+	while (!_actions.empty()) {
+		_numbers.push(calcul());
 	}
-	while ((int)_actions.size() > 0) {
-		if (_actions.top().compare("+") == 0) {
-			std::cout << "add ";
-			Number num2 = _numbers.top();
-			std::cout << num2 << " and ";
-			_numbers.pop();
-			Number num1 = _numbers.top();
-			std::cout << num1 << " = ";
-			_numbers.pop();
-			Number result = Operation::add(num1.getNumber(), num2.getNumber());
-			_numbers.push(result);
-			std::cout << result << "\n";
-			_actions.pop();
-		}
-		else if (_actions.top().compare("-") == 0) {
-			std::cout << "sub ";
-			Number num2 = _numbers.top();
-			std::cout << num2 << " and ";
-			_numbers.pop();
-			Number num1 = _numbers.top();
-			std::cout << num1 << " = ";
-			_numbers.pop();
-			Number result = Operation::sub(num1.getNumber(), num2.getNumber());
-			_numbers.push(result);
-			std::cout << result << "\n";
-			_actions.pop();
-		}
-		else if (_actions.top().compare("*") == 0) {
-			std::cout << "mult ";
-			Number num2 = _numbers.top();
-			std::cout << num2 << " and ";
-			_numbers.pop();
-			Number num1 = _numbers.top();
-			std::cout << num1 << " = ";
-			_numbers.pop();
-			Number result = Operation::mult(num1.getNumber(), num2.getNumber());
-			_numbers.push(result);
-			std::cout << result << "\n";
-			_actions.pop();
-		}/*
-		else if (_actions.top().compare("/") == 0) {
-			Number num2 = _numbers.top();
-			_numbers.pop();
-			Number num1 = _numbers.top();
-			_numbers.pop();
-			Number result = Operation::div(num1.getNumber(), num2.getNumber());
-			_numbers.push(result);
-			_actions.pop();
-		}*/
-		else {
-			std::cout << "other";
-		}
+	if ((int)_numbers.size() > 1)
+	{
+		std::cout << "Syntax error \n";
+		exit(EXIT_FAILURE);
+	}
+	printStacks();
+}
+
+Number Bistro::calcul()
+{	
+	if (_actions.empty()) {
+		std::cout << "Error : action empty\n";
+		exit(EXIT_FAILURE);
+	}
+	std::vector<int> rightNum = _numbers.top().number;
+	_numbers.pop();
+	std::vector<int> leftNum = _numbers.top().number;
+	_numbers.pop();
+	Number toReturn;
+	if (_actions.top().type == Token::Type::ADD) {
+		//if (leftNum.sign == Number::Sign::NEGATIF && rightNum)
+		toReturn = Operation::add(leftNum, rightNum);
+	}
+	else if (_actions.top().type == Token::Type::SUB) {
+		toReturn = Operation::sub(leftNum, rightNum);
+	}
+	else if (_actions.top().type == Token::Type::MULT) {
+		toReturn = Operation::mult(leftNum, rightNum);
+	}/*
+	else if (_actions.top().type == Token::Type::DIV) {
+		toReturn = Operation::div(leftNum, rightNum);
 		
+	}*/
+	else {
+		std::cout << "Error operator " << _actions.top() << ".\n";
+		exit(EXIT_FAILURE);
 	}
-	std::cout << _numbers.top();
+	_actions.pop();
+	return toReturn;
 }
