@@ -11,10 +11,9 @@
 #include "utility.hpp"
 #include "operation.hpp"
 
-Bistro::Bistro(char *argv)
+Bistro::Bistro(std::string str)
 {
-	std::string arg(argv);
-	_tokens = lexer(arg);
+	_tokens = lexer(str);
 	stacking();
 }
 

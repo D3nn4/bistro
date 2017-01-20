@@ -19,7 +19,8 @@ class Bistro
 		
 
 	public:
-		Bistro(char *argv);
+		
+		Bistro(std::string str);
 		std::vector<Token> lexer(std::string av);
 		void stacking();
 		void printStacks();

@@ -12,7 +12,7 @@ for i in "${exprList[@]}"
 do
   echo "Computing " $i
   bcRes=$(echo $i | bc)
-  bistroRes=$(./bistro.exec $i)
+  bistroRes=$(echo $i | ./bistro.exec)
   echo "BC result : $bcRes"
   echo "Bistro result : $bistroRes"
   
