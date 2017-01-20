@@ -6,11 +6,17 @@
 Number Utility::stringToNumber(std::string str)
 {
 	std::vector<int> num;
-	for (int i = 0; i < (int)str.size(); ++i)
+	int i = 0;
+	Number::Sign sign = Number::Sign::POSITIF;
+	if (str[0] == '-') {
+			++i;
+			sign = Number::Sign::NEGATIF;
+	}
+	for (; i < (int)str.size(); ++i)
 	{
 		num.push_back(str[i] - '0');
 	}
-	Number number(num, Number::Sign::POSITIF);
+	Number number(num, sign);
 	return number;
 }
 

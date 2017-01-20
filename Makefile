@@ -1,7 +1,6 @@
 NAME = bistro.exec
 
 SRC = 	bistro.cpp \
-		lexer.cpp \
 		token.cpp \
 		main.cpp \
 		number.cpp \
@@ -10,17 +9,17 @@ SRC = 	bistro.cpp \
 		
 HEADER = -I.
 
-OBJDIR = 
+OBJDIR = ./objdir
 
 all : $(NAME)
 
 $(NAME) : 
 	g++ -std=c++11 -ggdb3 -Wall -Wextra $(HEADER) -c $(SRC) 
 	g++ -o $(NAME)   *.o 
-	
+	mv *.o $(OBJDIR)
 	
 clean : 
-	rm -f *.o
+	rm -f $(OBJDIR)/*.o
 
 fclean : clean
 	rm -f $(NAME)

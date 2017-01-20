@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <vector>
 #include <stdbool.h>
 #include <cstdlib>
 
@@ -29,6 +30,106 @@ void Bistro::printStacks()
 	}
 }
 
+bool Bistro::isPar(Token token)
+{
+	if (token.type == Token::Type::OPENPAR
+		|| token.type == Token::Type::CLOSEPAR) {
+		return true;
+	}
+	return false;
+}
+
+bool Bistro::isOp(Token token)
+{
+	if (token.type == Token::Type::SUB
+		|| token.type == Token::Type::ADD
+		|| token.type == Token::Type::MULT
+		|| token.type == Token::Type::DIV) {
+		return true;
+	}
+	return false;
+}
+
+std::vector<Token> Bistro::lexer(std::string av)
+{
+	std::vector<Token> tokens;
+	std::string current_value;
+	bool nextNumNeg = false;
+	std::string::iterator it = av.begin();
+	for (; it != av.end(); ++it) {
+		if ('0' <= *it && *it <= '9') {
+			if (nextNumNeg) {
+				current_value += '-';
+				nextNumNeg = false;
+			}
+			current_value += *it;
+		}
+		else {
+			if (!current_value.empty()) {
+				Token temp(current_value, Token::Type::NUM);
+				tokens.push_back(temp);
+				current_value.erase(current_value.begin(), current_value.end());
+			}
+			if (nextNumNeg) {
+				std::cout << "Syntax error.\n";
+				exit(EXIT_FAILURE);
+			}
+			if (*it == '+') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::ADD);
+				tokens.push_back(temp);
+			}
+			else if (*it == '-') {
+				if (tokens.empty()
+					|| isOp(tokens.back())
+					|| tokens.back().type == Token::Type::OPENPAR) {
+					nextNumNeg = true;
+				}
+				else {
+					std::string value_op;
+					value_op += *it;
+					Token temp(value_op, Token::Type::SUB);
+					tokens.push_back(temp);
+				}
+			}
+			else if (*it == '*') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::MULT);
+				tokens.push_back(temp);
+			}
+			else if (*it == '/') {
+				std::string value_op;
+				value_op += *it;
+				Token temp(value_op, Token::Type::DIV);
+				tokens.push_back(temp);
+			}
+			else if (*it == '(') {
+				std::string value_par;
+				value_par += *it;
+				Token temp(value_par, Token::Type::OPENPAR);
+				tokens.push_back(temp);
+			}
+			else if (*it == ')') {
+				std::string value_par;
+				value_par += *it;
+				Token temp(value_par, Token::Type::CLOSEPAR);
+				tokens.push_back(temp);
+			}
+			else if (*it != ' ' && *it != '\0' && *it != '\n') {
+				std::cout << "Syntax error \n";
+				exit(0);
+			}
+		}
+	}
+	if (!current_value.empty()) {
+		Token temp(current_value, Token::Type::NUM);
+		tokens.push_back(temp);
+		current_value.erase(current_value.begin(), current_value.end());
+	}
+	return tokens;
+}
 void Bistro::stacking()
 {
 	std::vector<Token>::iterator it = _tokens.begin();
@@ -79,7 +180,11 @@ void Bistro::unstacking()
 Number Bistro::calcul()
 {	
 	if (_actions.empty()) {
-		std::cout << "Error : action empty\n";
+		std::cout << "Syntax error \n";
+		exit(EXIT_FAILURE);
+	}
+	if ((int)_numbers.size() < 2) {
+		std::cout << "Syntax error \n";
 		exit(EXIT_FAILURE);
 	}
 	Number rightNum = _numbers.top();
@@ -98,7 +203,7 @@ Number Bistro::calcul()
 		}
 		else if (leftNum.sign == Number::Sign::NEGATIF 
 			&& rightNum.sign == Number::Sign::NEGATIF) {
-			toReturn = Operation::sub(rightNum.number, leftNum.number);
+			toReturn = Operation::add(rightNum.number, leftNum.number);
 			toReturn.sign = Number::Sign::NEGATIF;
 		}
 		else {
@@ -138,7 +243,7 @@ Number Bistro::calcul()
 		
 	}*/
 	else {
-		std::cout << "Error operator " << _actions.top() << ".\n";
+		std::cout << "Syntax error \n";
 		exit(EXIT_FAILURE);
 	}
 	_actions.pop();

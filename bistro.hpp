@@ -14,6 +14,8 @@ class Bistro
 		std::vector<Token> _tokens;
 		std::stack<Token> _actions;
 		std::stack<Number> _numbers;
+		bool isPar(Token token);
+		bool isOp(Token token);
 		
 
 	public:
