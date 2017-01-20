@@ -82,22 +82,58 @@ Number Bistro::calcul()
 		std::cout << "Error : action empty\n";
 		exit(EXIT_FAILURE);
 	}
-	std::vector<int> rightNum = _numbers.top().number;
+	Number rightNum = _numbers.top();
 	_numbers.pop();
-	std::vector<int> leftNum = _numbers.top().number;
+	Number leftNum = _numbers.top();
 	_numbers.pop();
 	Number toReturn;
-	if (_actions.top().type == Token::Type::ADD) {
-		//if (leftNum.sign == Number::Sign::NEGATIF && rightNum)
-		toReturn = Operation::add(leftNum, rightNum);
+	if (_actions.top().type == Token::Type::ADD) { // si ADD
+		if (leftNum.sign == Number::Sign::NEGATIF 
+			&& rightNum.sign == Number::Sign::POSITIF) {
+			toReturn = Operation::sub(rightNum.number, leftNum.number);
+		}
+		else if (leftNum.sign == Number::Sign::POSITIF 
+			&& rightNum.sign == Number::Sign::NEGATIF) {
+			toReturn = Operation::sub(leftNum.number, rightNum.number);
+		}
+		else if (leftNum.sign == Number::Sign::NEGATIF 
+			&& rightNum.sign == Number::Sign::NEGATIF) {
+			toReturn = Operation::sub(rightNum.number, leftNum.number);
+			toReturn.sign = Number::Sign::NEGATIF;
+		}
+		else {
+			toReturn = Operation::add(leftNum.number, rightNum.number);
+		}	
 	}
-	else if (_actions.top().type == Token::Type::SUB) {
-		toReturn = Operation::sub(leftNum, rightNum);
+	else if (_actions.top().type == Token::Type::SUB) { // SI SUB
+		if (leftNum.sign == Number::Sign::NEGATIF 
+			&& rightNum.sign == Number::Sign::POSITIF) {
+			toReturn = Operation::add(leftNum.number, rightNum.number);
+			toReturn.sign = Number::Sign::NEGATIF;
+		}
+		else if (leftNum.sign == Number::Sign::POSITIF 
+			&& rightNum.sign == Number::Sign::NEGATIF) {
+			toReturn = Operation::add(leftNum.number, rightNum.number);
+		}
+		else if (leftNum.sign == Number::Sign::NEGATIF 
+			&& rightNum.sign == Number::Sign::NEGATIF) {
+			toReturn = Operation::sub(rightNum.number, leftNum.number);
+		}
+		else {
+			toReturn = Operation::sub(leftNum.number, rightNum.number);
+		}
 	}
-	else if (_actions.top().type == Token::Type::MULT) {
-		toReturn = Operation::mult(leftNum, rightNum);
+	else if (_actions.top().type == Token::Type::MULT) {//SI MULT
+		if (leftNum.sign != rightNum.sign) {
+			toReturn = Operation::mult(leftNum.number, rightNum.number);
+			toReturn.sign = Number::Sign::NEGATIF;
+		}
+		else {
+			toReturn = Operation::mult(leftNum.number, rightNum.number);
+		}
+		
 	}/*
-	else if (_actions.top().type == Token::Type::DIV) {
+	else if (_actions.top().type == Token::Type::DIV) { //SI DIV
 		toReturn = Operation::div(leftNum, rightNum);
 		
 	}*/

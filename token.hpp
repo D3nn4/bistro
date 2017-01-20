@@ -6,7 +6,6 @@
 
 struct Token
 {	
-
 	enum class Type {
 		NUM, 
 		ADD,

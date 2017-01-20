@@ -83,7 +83,6 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 {
 	int shift = 0;
 	int rest = 0;
-	Number::Sign sign = Number::Sign::POSITIF;
 	std::vector<int> leftToAdd;
 	std::vector<int> rightToAdd;
 	std::vector<int>::reverse_iterator curr_num2 = num2.rbegin();
@@ -103,7 +102,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 				rest = 0;
 		}
 		if (rest > 0)
-			leftToAdd.push_back(rest);
+			temp.push_back(rest);
 		if (!leftToAdd.empty() && !rightToAdd.empty()) {
 			Number toAdd = add(leftToAdd, rightToAdd);
 			leftToAdd.clear();
@@ -111,6 +110,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 			leftToAdd = toAdd.number;
 		}
 		else if (leftToAdd.empty()) {
+
 			leftToAdd = Utility::reverseVector(temp);
 		}
 		else {
@@ -125,7 +125,7 @@ Number Operation::mult(std::vector<int> num1, std::vector<int> num2)
 			leftToAdd = toAdd.number;
 	}
 
-	Number result(leftToAdd, sign);
+	Number result(leftToAdd, Number::Sign::POSITIF);
 	return result;
 }
 /*
