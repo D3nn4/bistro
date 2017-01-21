@@ -13,8 +13,9 @@
 
 Bistro::Bistro(std::string str)
 {
-	_tokens = lexer(str);
-	stacking();
+	if (lexer(str)) {
+		stacking();
+	}
 }
 
 void Bistro::printStacks()
@@ -49,9 +50,8 @@ bool Bistro::isOp(Token token)
 	return false;
 }
 
-std::vector<Token> Bistro::lexer(std::string av)
+bool Bistro::lexer(std::string av)
 {
-	std::vector<Token> tokens;
 	std::string current_value;
 	bool nextNumNeg = false;
 	std::string::iterator it = av.begin();
@@ -66,68 +66,68 @@ std::vector<Token> Bistro::lexer(std::string av)
 		else {
 			if (!current_value.empty()) {
 				Token temp(current_value, Token::Type::NUM);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 				current_value.erase(current_value.begin(), current_value.end());
 			}
 			if (nextNumNeg) {
-				std::cout << "Syntax error.\n";
-				exit(EXIT_FAILURE);
+				Utility::syntaxErrorMsg();
+				return false;
 			}
 			if (*it == '+') {
 				std::string value_op;
 				value_op += *it;
 				Token temp(value_op, Token::Type::ADD);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 			}
 			else if (*it == '-') {
-				if (tokens.empty()
-					|| isOp(tokens.back())
-					|| tokens.back().type == Token::Type::OPENPAR) {
+				if (_tokens.empty()
+					|| isOp(_tokens.back())
+					|| _tokens.back().type == Token::Type::OPENPAR) {
 					nextNumNeg = true;
 				}
 				else {
 					std::string value_op;
 					value_op += *it;
 					Token temp(value_op, Token::Type::SUB);
-					tokens.push_back(temp);
+					_tokens.push_back(temp);
 				}
 			}
 			else if (*it == '*') {
 				std::string value_op;
 				value_op += *it;
 				Token temp(value_op, Token::Type::MULT);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 			}
 			else if (*it == '/') {
 				std::string value_op;
 				value_op += *it;
 				Token temp(value_op, Token::Type::DIV);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 			}
 			else if (*it == '(') {
 				std::string value_par;
 				value_par += *it;
 				Token temp(value_par, Token::Type::OPENPAR);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 			}
 			else if (*it == ')') {
 				std::string value_par;
 				value_par += *it;
 				Token temp(value_par, Token::Type::CLOSEPAR);
-				tokens.push_back(temp);
+				_tokens.push_back(temp);
 			}
 			else if (*it != ' ' && *it != '\0' && *it != '\n') {
-				std::cout << "Syntax error \n";
-				exit(0);
+				Utility::syntaxErrorMsg();
+				return false;
 			}
 		}
 	}
 	if (!current_value.empty()) {
 		Token temp(current_value, Token::Type::NUM);
-		tokens.push_back(temp);
+		_tokens.push_back(temp);
 		current_value.erase(current_value.begin(), current_value.end());
 	}
-	return tokens;
+	return true;
 }
 void Bistro::stacking()
 {
@@ -141,21 +141,42 @@ void Bistro::stacking()
 		}
 		else if ((*it).type == Token::Type::CLOSEPAR) {
 			while (_actions.top().type != Token::Type::OPENPAR) {
-				_numbers.push(calcul());
+				Result result = calcul();
+				if (result.success == Result::Success::SUCCESS) {
+					_numbers.push(result.number);	
+				}
+				else {
+					result.successMsg();
+					return;
+				}
 			}
 			_actions.pop();
 		}
 		else if ((*it).type == Token::Type::ADD || (*it).type == Token::Type::SUB) {
 			if((!_actions.empty()) && ((_actions.top().type == Token::Type::MULT) 
 				|| (_actions.top().type == Token::Type::DIV))) {
-				_numbers.push(calcul());
+				Result result = calcul();
+				if (result.success == Result::Success::SUCCESS) {
+					_numbers.push(result.number);	
+				}
+				else {
+					result.successMsg();
+					return;
+				}
 			}
 			_actions.push(*it);
 		}
 		else if ((*it).type == Token::Type::MULT || (*it).type == Token::Type::DIV) {
 			if((!_actions.empty()) && ((_actions.top().type == Token::Type::MULT) 
 				|| (_actions.top().type == Token::Type::DIV))) {
-				_numbers.push(calcul());
+				Result result = calcul();
+				if (result.success == Result::Success::SUCCESS) {
+					_numbers.push(result.number);	
+				}
+				else {
+					result.successMsg();
+					return;
+				}
 			}
 			_actions.push(*it);
 		}
@@ -166,31 +187,35 @@ void Bistro::stacking()
 void Bistro::unstacking()
 {
 	while (!_actions.empty()) {
-		_numbers.push(calcul());
+		Result result = calcul();
+		if (result.success == Result::Success::SUCCESS) {
+			_numbers.push(result.number);	
+		}
+		else {
+			result.successMsg();
+			return;
+		}
 	}
 	if ((int)_numbers.size() > 1)
 	{
-		std::cout << "Syntax error \n";
-		exit(EXIT_FAILURE);
+		Utility::syntaxErrorMsg();
+		return;
 	}
 	printStacks();
 }
 
-Number Bistro::calcul()
+Result Bistro::calcul()
 {	
-	if (_actions.empty()) {
-		std::cout << "Syntax error \n";
-		exit(EXIT_FAILURE);
-	}
-	if ((int)_numbers.size() < 2) {
-		std::cout << "Syntax error \n";
-		exit(EXIT_FAILURE);
+	if (_actions.empty() || ((int)_numbers.size() < 2)) {
+		Number num;
+		Result toReturn(num, Result::Success::SYNTAXERROR);
+		return toReturn;
 	}
 	Number rightNum = _numbers.top();
 	_numbers.pop();
 	Number leftNum = _numbers.top();
 	_numbers.pop();
-	Number toReturn;
+	Result toReturn;
 	if (_actions.top().type == Token::Type::ADD) { // si ADD
 		if (leftNum.sign == Number::Sign::NEGATIF 
 			&& rightNum.sign == Number::Sign::POSITIF) {
@@ -203,7 +228,7 @@ Number Bistro::calcul()
 		else if (leftNum.sign == Number::Sign::NEGATIF 
 			&& rightNum.sign == Number::Sign::NEGATIF) {
 			toReturn = Operation::add(rightNum.number, leftNum.number);
-			toReturn.sign = Number::Sign::NEGATIF;
+			toReturn.number.sign = Number::Sign::NEGATIF;
 		}
 		else {
 			toReturn = Operation::add(leftNum.number, rightNum.number);
@@ -213,7 +238,7 @@ Number Bistro::calcul()
 		if (leftNum.sign == Number::Sign::NEGATIF 
 			&& rightNum.sign == Number::Sign::POSITIF) {
 			toReturn = Operation::add(leftNum.number, rightNum.number);
-			toReturn.sign = Number::Sign::NEGATIF;
+			toReturn.number.sign = Number::Sign::NEGATIF;
 		}
 		else if (leftNum.sign == Number::Sign::POSITIF 
 			&& rightNum.sign == Number::Sign::NEGATIF) {
@@ -230,20 +255,27 @@ Number Bistro::calcul()
 	else if (_actions.top().type == Token::Type::MULT) {//SI MULT
 		if (leftNum.sign != rightNum.sign) {
 			toReturn = Operation::mult(leftNum.number, rightNum.number);
-			toReturn.sign = Number::Sign::NEGATIF;
+			toReturn.number.sign = Number::Sign::NEGATIF;
 		}
 		else {
 			toReturn = Operation::mult(leftNum.number, rightNum.number);
 		}
 		
-	}/*
+	}
 	else if (_actions.top().type == Token::Type::DIV) { //SI DIV
-		toReturn = Operation::div(leftNum, rightNum);
+		if (leftNum.sign != rightNum.sign) {
+			toReturn = Operation::div(leftNum.number, rightNum.number);
+			toReturn.number.sign = Number::Sign::NEGATIF;
+		}
+		else {
+			toReturn = Operation::div(leftNum.number, rightNum.number);
+		}
 		
-	}*/
+	}
 	else {
-		std::cout << "Syntax error \n";
-		exit(EXIT_FAILURE);
+		Number num;
+		Result error(num, Result::Success::SYNTAXERROR);
+		return error;
 	}
 	_actions.pop();
 	return toReturn;

@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <stdbool.h>
 #include "number.hpp"
 #include "token.hpp"
+#include "result.hpp"
 
 class Bistro
 {
@@ -21,11 +23,11 @@ class Bistro
 	public:
 		
 		Bistro(std::string str);
-		std::vector<Token> lexer(std::string av);
+		bool lexer(std::string av);
 		void stacking();
 		void printStacks();
 		void unstacking();
-		Number calcul();
+		Result calcul();
 };
 
 std::ostream &operator<<(std::ostream &o, Bistro const &bistro);

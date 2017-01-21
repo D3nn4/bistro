@@ -29,3 +29,26 @@ std::vector<int> Utility::reverseVector(std::vector<int> number)
 	}
 	return toReturn;
 }
+
+void Utility::cleanZero(std::vector<int> &number)
+{
+	if ((int)number.size() == 1 && number.front() == 0) {
+		return;
+	}
+	while (!number.empty() && number.front() == 0) {
+		number.erase(number.begin());
+	}
+	if (number.empty()) {
+		number.push_back(0);
+	}
+}
+
+void Utility::syntaxErrorMsg()
+{
+	std::cout << "Syntax error\n";
+}
+
+void Utility::zeroDividedMsg()
+{
+	std::cout << "Error : divide by zero\n";
+}

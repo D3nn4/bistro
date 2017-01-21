@@ -5,6 +5,7 @@ SRC = 	bistro.cpp \
 		main.cpp \
 		number.cpp \
 		utility.cpp \
+		result.cpp \
 		operation.cpp 
 		
 HEADER = -I.
